@@ -4,10 +4,11 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.constants import ChatAction
 
-# Укажите ваш токен от BotFather
-TELEGRAM_TOKEN = '7005774280:AAF2eAGaANVdDXI2nt4Xz7zwaps-h6bV6kU'
-# Директория для временного хранения загруженных аудио файлов
-output_path = r'C:\Users\admin\Documents'
+# Получаем токен из переменной окружения (так он безопаснее хранится на сервере)
+TELEGRAM_TOKEN = os.getenv("TOKEN")
+
+# Директория для временного хранения загруженных аудио файлов (Railway допускает временную директорию /tmp)
+output_path = '/tmp'
 
 # Функция для загрузки аудио с YouTube и конвертации в MP3
 def download_audio(youtube_url):

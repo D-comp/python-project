@@ -12,6 +12,7 @@ output_path = '/tmp'
 
 # Функция для загрузки аудио с YouTube и конвертации в MP3
 def download_audio(youtube_url):
+    ffmpeg_path = '/usr/bin/ffmpeg'  # Укажите путь к ffmpeg
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
@@ -22,6 +23,7 @@ def download_audio(youtube_url):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
+        'ffmpeg_location': ffmpeg_path,  # Укажите путь к ffmpeg
     }
 
     try:

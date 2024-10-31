@@ -3,12 +3,20 @@ from yt_dlp import YoutubeDL
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.constants import ChatAction
+import re
+
+
 
 # Получаем токен из переменной окружения (так он безопаснее хранится на сервере)
 TELEGRAM_TOKEN = os.getenv("TOKEN")
 
 # Директория для временного хранения загруженных аудио файлов (Railway допускает временную директорию /tmp)
 output_path = '/tmp'
+
+# Функция для предотвразения ошибки нечитаемых символов в назывании ролика
+def sanitize_filename(filename):
+    # Удаляем запрещенные символы
+    return re.sub(r'[\\/:"*?<>|]+', '', filename)
 
 # Функция для загрузки аудио с YouTube и конвертации в MP3
 def download_audio(youtube_url):
@@ -27,7 +35,8 @@ def download_audio(youtube_url):
     try:
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(youtube_url, download=True)
-            audio_file_path = os.path.join(output_path, f"{info['title']}.mp3")
+            sanitized_title = sanitize_filename(info['title'])
+            audio_file_path = os.path.join(output_path, f"{sanitized_title}.mp3")
             return audio_file_path
     except Exception as e:
         print(f"Произошла ошибка при загрузке: {e}")

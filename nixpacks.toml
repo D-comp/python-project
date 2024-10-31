@@ -1,8 +1,11 @@
 [phases.setup]
-nixPkgs = ["ffmpeg"]
+nixPkgs = ["ffmpeg", "python3"]
+
+[phases.install]
+cmds = ["python -m venv /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt"]
 
 [phases.build]
 cmds = ["echo 'Building...'"]
 
 [phases.start]
-cmd = "python main.py"
+cmd = ". /opt/venv/bin/activate && python main.py"

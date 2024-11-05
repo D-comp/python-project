@@ -23,24 +23,39 @@ output_path = '/tmp'
 def sanitize_filename(filename):
     return re.sub(r'[\\/:"*?<>|]+', '', filename)
 
+# Функция для выбора качества аудио в зависимости от длительности ролика
+def get_quality_by_duration(duration):
+    if duration < 600:  # меньше 10 минут
+        return '192'
+    elif duration < 1800:  # меньше 30 минут
+        return '128'
+    else:  # более 30 минут
+        return '96'
+
 # Функция для загрузки аудио с YouTube и конвертации в MP3
 def download_audio(youtube_url):
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
-        'noplaylist': True,
-        'quiet': True,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-    }
-
     try:
-        with YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(youtube_url, download=True)
+        # Получаем информацию о видео для определения длительности
+        with YoutubeDL({'quiet': True}) as ydl:
+            info = ydl.extract_info(youtube_url, download=False)
+            duration = info.get('duration', 0)
+            quality = get_quality_by_duration(duration)
             sanitized_title = sanitize_filename(info['title'])
+
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': os.path.join(output_path, f'{sanitized_title}.%(ext)s'),
+            'noplaylist': True,
+            'quiet': True,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': quality,
+            }],
+        }
+
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([youtube_url])
             audio_file_path = os.path.join(output_path, f"{sanitized_title}.mp3")
             return audio_file_path
     except Exception as e:

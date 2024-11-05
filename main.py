@@ -7,8 +7,8 @@ from telegram.constants import ChatAction
 import re
 
 # Инициализируем логирование
-#logging.basicConfig(level=logging.INFO)
-#logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Получаем токен из переменной окружения
 TELEGRAM_TOKEN = os.getenv("TOKEN")
